@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace ExpenseTracker.Data.Models;
 
@@ -11,6 +12,8 @@ public class LineItem
 
 	[Precision(18, 2)]
 	public decimal Amount { get; set; }
+
+	[JsonConverter(typeof(JsonStringEnumConverter))]
 	public ItemType Type { get; set; }
 
 	[Unicode(false)]

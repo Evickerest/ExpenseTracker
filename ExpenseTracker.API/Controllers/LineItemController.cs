@@ -1,5 +1,5 @@
-﻿using ExpenseTracker.Data.Contexts;
-using ExpenseTracker.Data.Dtos;
+﻿using ExpenseTracker.API.Dtos;
+using ExpenseTracker.Data.Contexts;
 using ExpenseTracker.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +12,9 @@ public class LineItemController(ApplicationContext _dbContext) : ControllerBase
 {
 	[HttpGet]
 	public async Task<ActionResult<List<LineItem>>> GetAll(CancellationToken ct) =>
-		await _dbContext.LineItems.AsNoTracking().ToListAsync(ct);
+		await _dbContext.LineItems.AsNoTracking().
+			OrderByDescending(l => l.Timestamp).
+			ToListAsync(ct);
 
 	[HttpPost]
 	public async Task<ActionResult<LineItem>> Insert([FromBody] LineItemUpdateDto dto)

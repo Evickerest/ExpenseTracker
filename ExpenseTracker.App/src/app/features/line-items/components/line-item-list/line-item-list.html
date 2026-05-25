@@ -1,34 +1,85 @@
-<h1>Lines:</h1>
-
-@if (isLoading()) {
-    <p>Loading data...</p>
-} @else {
-    @if (!hasError()) {
-        <table>
-            <thead>
+<div id="lines-table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>Amount</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Timestamp</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (isLoading()) {
                 <tr>
-                    <th>Id</th>
-                    <th>Timestamp</th>
-                    <th>Amount</th>
-                    <th>Type</th>
-                    <th>Description</th>
+                    <td>Loading data...</td>
                 </tr>
-            </thead>
-            <tbody>
+            } @else if (!hasError()) {
+                <tr id="add-row" (click)="addLine()">
+                    <td></td><td></td>
+                    <td><img src="images/add.svg" /></td>
+                    <td></td><td></td>
+                </tr>
                 @for (line of lines(); track line.id) {
+                    @let style = line.amount < 0 ? "negative" : "positive";
                     <tr>
-                        <td>{{ line.id }}</td>
-                        <td>{{ line.timestamp | date:"MM/dd/yyyy HH:MM:SS" }}</td>
-                        <td>{{ line.amount }}</td>
+                        <td [class]="style">{{ line.amount }}</td>
                         <td>{{ line.type }}</td>
                         <td>{{ line.description }}</td>
+                        <td>{{ line.timestamp | date:"M/dd/yyyy h:MM:SS aa" }}</td>
+                        <td class="row-actions">
+                            <button (click)="editLine(line)">Edit</button>
+                            <button (click)="deleteLine(line)">Delete</button>
+                        </td>
                     </tr>
                 }
-            </tbody>
-        </table>
-    } @else {
-        <p>Failed to get data.</p>
-    }
-}
-
-
+            } @else {
+                <tr>
+                    <td>Failed to get data.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<dialog #editPopup>
+    @let l = editingLine();
+    <h2>{{ l.id === 0 ? "Add Line" : "Edit Line"}}</h2>
+    <form>
+        <div class="form-field">
+            <label>Amount:</label>
+            <input type="number" [formField]="editForm.amount" step="0.01" />
+        </div>
+        <div class="form-field">
+            <label>Type:</label>
+            <select [formField]="editForm.type">
+                <option value="">Select a Type</option>
+                <option value="Gas">Gas</option>
+                <option value="Groceries">Groceries</option>
+                <option value="FastFood">FastFood</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Bills">Bills</option>
+                <option value="Cash">Cash</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Gifts">Gifts</option>
+                <option value="Automotive">Automotive</option>
+                <option value="Health">Health</option>
+                <option value="Home">Home</option>
+                <option value="Travel">Travel</option>
+                <option value="ProfessionalServices">ProfessionalServices</option>
+                <option value="Education">Education</option>
+            </select>
+        </div>
+        <div class="form-field">
+            <label>Timestamp:</label>
+            <input type="datetime-local" [formField]="editForm.timestamp" />
+        </div>
+        <div class="form-field">
+            <label>Description:</label>
+            <textarea [formField]="editForm.description" rows="5"></textarea>
+        </div>
+    </form>
+    <div id="popup-actions">
+        <button (click)="closeEditPopup()">Close</button>
+        <button (click)="submitEditPopup()">Submit</button>
+    </div>
+</dialog>
