@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { ApiService } from '../../../shared/services/api-service';
 import { catchError, Observable, of, switchMap } from 'rxjs';
 import { LineItem, LineItemUpdate } from '../models/line-item';
+import { LineItemSummary } from '../models/line-item-summary';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +12,10 @@ export class LineItemService {
 
     public getLines(): Observable<LineItem[]> {
         return this.apiService.getAll<LineItem[]>("line-items");
+    }
+
+    public getSummary(): Observable<LineItemSummary> {
+        return this.apiService.getAll<LineItemSummary>("line-items/summary");
     }
     
     public createLine(line: LineItem): Observable<LineItem | null> {

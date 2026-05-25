@@ -1,3 +1,52 @@
+<div id="summary-cards">
+    @let sum = summary();
+    @let summaryLoading = summaryIsLoading();
+
+    <div class="summary-card card-earnings">
+        <div class="summary-card-info">
+            <h2>EARNINGS (MONTHLY)</h2>
+            @if (summaryLoading) {
+                <img class="card-loading-icon" src="images/ellipsis.svg" />
+            } @else {
+                <p>{{ sum.monthlyEarnings | currency }}</p>
+            }
+        </div>
+        <img class="summary-card-icon" src="images/calendar.svg" alt="Calendar" />
+    </div>
+    <div class="summary-card card-expenses">
+        <div class="summary-card-info">
+            <h2>EXPENSES (MONTHLY)</h2>
+            @if (summaryLoading) {
+                <img class="card-loading-icon" src="images/ellipsis.svg" />
+            } @else {
+                <p>{{ sum.monthlyExpenses | currency }}</p>
+            }
+        </div>
+        <img class="summary-card-icon" src="images/dollar.svg" alt="Calendar" />
+    </div>
+    <div class="summary-card card-earnings">
+        <div class="summary-card-info">
+            <h2>EARNINGS (YTD)</h2>
+            @if (summaryLoading) {
+                <img class="card-loading-icon" src="images/ellipsis.svg" />
+            } @else {
+                <p>{{ sum.annualEarnings| currency }}</p>
+            }
+        </div>
+        <img class="summary-card-icon" src="images/calendar.svg" alt="Calendar" />
+    </div>
+    <div class="summary-card card-expenses">
+        <div class="summary-card-info">
+            <h2>EXPENSES (YTD)</h2>
+            @if (summaryLoading) {
+                <img class="card-loading-icon" src="images/ellipsis.svg" />
+            } @else {
+                <p>{{ sum.annualExpenses| currency }}</p>
+            }
+        </div>
+        <img class="summary-card-icon" src="images/dollar.svg" alt="Calendar" />
+    </div>
+</div>
 <div id="lines-table-wrapper">
     <table>
         <thead>
@@ -10,11 +59,11 @@
             </tr>
         </thead>
         <tbody>
-            @if (isLoading()) {
+            @if (linesIsLoading()) {
                 <tr>
                     <td>Loading data...</td>
                 </tr>
-            } @else if (!hasError()) {
+            } @else if (!linesHasError()) {
                 <tr id="add-row" (click)="addLine()">
                     <td></td><td></td>
                     <td><img src="images/add.svg" /></td>
@@ -35,7 +84,7 @@
                 }
             } @else {
                 <tr>
-                    <td>Failed to get data.</td>
+                    <td>Failed to get data: {{ linesHasError()?.message }}</td>
                 </tr>
             }
         </tbody>

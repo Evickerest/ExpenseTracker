@@ -1,3 +1,61 @@
+#summary-cards {
+    display: flex;
+    justify-content: space-between;
+    padding: 2rem;
+    padding-bottom: 0;
+    column-gap: 1rem;
+}
+
+.summary-card {
+    display: flex;
+    box-shadow: 0 0 20px rgb(0 0 0 / 0.15);
+    border-radius: 9px;
+    padding: 10px 15px;
+    flex: 1;
+    justify-content: space-between;
+}
+
+.card-earnings {
+    --color: rgb(44, 159, 119);
+
+    border-left: 8px solid var(--color);
+
+    h2 {
+        color: var(--color);
+    }
+}
+
+.card-expenses {
+    --color: rgb(242, 92, 59);
+
+    border-left: 8px solid var(--color);
+
+    h2 {
+        color: var(--color);
+    }
+}
+
+.summary-card-info h2 {
+    font-size: 0.8rem; 
+    margin-bottom: 5px;
+}
+
+.summary-card-info p {
+    margin-top: 0;
+    font-size: 1.2rem;
+}
+
+.summary-card-icon {
+    aspect-ratio: 1;
+    width: 50px;
+    filter: invert(82%) sepia(0%) saturate(365%) hue-rotate(193deg) brightness(107%) contrast(97%);
+}
+
+.card-loading-icon {
+    aspect-ratio: 1;
+    height: 30px;
+}
+
 #lines-table-wrapper {
     padding: 2rem;
     display: flex;

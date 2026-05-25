@@ -16,6 +16,31 @@ public class LineItemController(ApplicationContext _dbContext) : ControllerBase
 			OrderByDescending(l => l.Timestamp).
 			ToListAsync(ct);
 
+	[HttpGet("summary")]
+	public async Task<ActionResult<LineItemSummaryDto>> GetSummary(CancellationToken ct)
+	{
+		int currentMonth = DateTime.Today.Month;
+
+		return await _dbContext.LineItems.AsNoTracking().
+			Where(l => l.Timestamp.Year == DateTime.Today.Year).
+			GroupBy(l => 1, (_, lines) => new LineItemSummaryDto
+			{
+				AnnualEarnings = lines.
+					Where(l => l.Amount > 0).
+					Sum(l => l.Amount),
+				AnnualExpenses = lines.
+					Where(l => l.Amount < 0).
+					Sum(l => l.Amount),
+				MonthlyEarnings = lines.
+					Where(l => l.Amount > 0 && l.Timestamp.Month == currentMonth).
+					Sum(l => l.Amount),
+				MonthlyExpenses = lines.
+					Where(l => l.Amount < 0 && l.Timestamp.Month == currentMonth).
+					Sum(l => l.Amount)
+			}).
+			FirstAsync(ct);
+	} 
+
 	[HttpPost]
 	public async Task<ActionResult<LineItem>> Insert([FromBody] LineItemUpdateDto dto)
 	{

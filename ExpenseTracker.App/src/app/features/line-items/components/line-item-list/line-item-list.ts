@@ -1,27 +1,39 @@
-import { Component, computed, ElementRef, inject, linkedSignal, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, linkedSignal, signal, viewChild } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { defaultLineItem, LineItem } from '../../models/line-item';
-import { DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { LineItemService } from '../../services/line-item-service';
 import { form, FormField } from '@angular/forms/signals';
+import { defaultLineItemSummary } from '../../models/line-item-summary';
 
 @Component({
   selector: 'app-line-item-list',
-  imports: [DatePipe, FormField],
+  imports: [DatePipe, FormField, CurrencyPipe],
   templateUrl: './line-item-list.html',
   styleUrl: './line-item-list.css',
 })
 export class LineItemList {
     private readonly lineService = inject(LineItemService);
     private readonly editPopup = viewChild.required<ElementRef<HTMLDialogElement>>("editPopup");
+
     private readonly lineResource = rxResource({
         stream: () => this.lineService.getLines(),
         defaultValue: []
     });
+    
+    private readonly summaryResource = rxResource({
+        stream: () => this.lineService.getSummary(),
+        defaultValue: defaultLineItemSummary
+    })
 
-    protected readonly isLoading = computed(() => this.lineResource.isLoading());
-    protected readonly hasError = computed(() => this.lineResource.error());
+    protected readonly linesIsLoading = computed(() => this.lineResource.isLoading());
+    protected readonly linesHasError = computed(() => this.lineResource.error());
     protected readonly lines = linkedSignal(() => this.lineResource.value());
+
+    protected readonly summaryIsLoading = computed(() => this.summaryResource.isLoading());
+    protected readonly summaryHasError = computed(() => this.summaryResource.error());
+    protected readonly summary = computed(() => this.summaryResource.hasValue() ? this.summaryResource.value() : defaultLineItemSummary);
+
     protected readonly editingLine = signal<LineItem>(defaultLineItem);
     protected readonly editForm = form(this.editingLine);
 
@@ -59,10 +71,10 @@ export class LineItemList {
             if (!res) {
                 alert("Failed to create line.");
             } else {
+                this.summaryResource.reload();
                 this.lines.update(r => {
-                    r.push(res);
-                    r.sort((l1, l2) => new Date(l1.timestamp).getTime() - new Date(l2.timestamp).getTime());
-                    return r;
+                    return [...r, line]
+                        .sort((l1, l2) => new Date(l1.timestamp).getTime() - new Date(l2.timestamp).getTime());
                 });
             }
         });
@@ -73,6 +85,7 @@ export class LineItemList {
             if (!res) {
                 alert("Failed to update line.");
             } else {
+                this.summaryResource.reload();
                 this.lines.update(r => r.map(l => {
                     if (l.id === line.id) return line;
                     return l;
@@ -89,6 +102,7 @@ export class LineItemList {
             if (!res) {
                 alert("Failed to delete line.");
             } else {
+                this.summaryResource.reload();
                 this.lines.update(r => r.filter(l => l.id !== line.id));
             }
         });
